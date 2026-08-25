@@ -1,0 +1,12 @@
+.vscode/
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+.DS_Store
+
+secrets/.env
+secrets/*
+!secrets/.env.example
