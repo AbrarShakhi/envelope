@@ -1,3 +1,9 @@
 spring:
-  application:
-    name: envelope-engine
+    application:
+        name: envelope-engine
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+    flyway:
+        enabled: true
