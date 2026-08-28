@@ -1,9 +1,25 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
 spring:
-    application:
-        name: envelope-engine
-    jpa:
-        open-in-view: false
-        hibernate:
-            ddl-auto: validate
-    flyway:
-        enabled: true
+  application:
+    name: envelope-engine
+
+  # Production must explicitly use:
+  # SPRING_PROFILES_ACTIVE=prod
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
