@@ -1,5 +1,6 @@
 package com.abrarshakhi.envelope.engine.config
 
+import com.abrarshakhi.envelope.engine.common.ratelimit.RateLimitFilter
 import com.abrarshakhi.envelope.engine.security.CustomUserDetailsService
 import com.abrarshakhi.envelope.engine.security.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
@@ -26,6 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val rateLimitFilter: RateLimitFilter,
     private val customUserDetailsService: CustomUserDetailsService,
     private val passwordEncoder: PasswordEncoder,
 ) {
@@ -69,6 +71,10 @@ class SecurityConfig(
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter::class.java,
+            )
+            .addFilterAfter(
+                rateLimitFilter,
+                JwtAuthenticationFilter::class.java,
             )
 
         return http.build()

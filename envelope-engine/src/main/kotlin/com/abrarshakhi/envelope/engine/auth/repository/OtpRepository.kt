@@ -34,4 +34,13 @@ interface OtpRepository : JpaRepository<Otp, Long> {
         identifier: String,
         purpose: OtpPurpose,
     ): Optional<Otp>
+
+    @Modifying
+    @Query(
+        """
+        DELETE FROM Otp o
+        WHERE o.expiresAt < :cutoff OR o.isUsed = true
+        """,
+    )
+    fun deleteExpiredOrUsedBefore(@Param("cutoff") cutoff: java.time.Instant): Int
 }

@@ -22,4 +22,15 @@ interface PasswordResetTokenRepository : JpaRepository<PasswordResetToken, Long>
         """,
     )
     fun invalidateAllUserTokens(@Param("user") user: User)
+
+
+    @Modifying
+    @Query(
+        """
+    DELETE FROM PasswordResetToken p
+    WHERE p.expiresAt < :cutoff OR p.isUsed = true
+    """,
+    )
+    fun deleteExpiredOrUsedBefore(@Param("cutoff") cutoff: java.time.Instant): Int
+
 }

@@ -33,16 +33,17 @@ class PasswordResetService(
     @Transactional
     fun requestPasswordReset(request: PasswordResetInitRequest): Long {
         val email = request.email.trim().lowercase()
-        val user = userRepository.findByEmailIgnoreCase(email)
-            .orElseThrow {
-                ResourceNotFoundException("Account not found with email: $email")
-            }
+        val userOpt = userRepository.findByEmailIgnoreCase(email)
 
-        if (!user.isEmailVerified) {
-            throw BadRequestException("Email address is not verified. Please complete account verification first.")
+        if (userOpt.isPresent) {
+            val user = userOpt.get()
+            if (user.isEmailVerified) {
+                return otpService.generateAndSendOtp(email, OtpPurpose.PASSWORD_RESET)
+            }
         }
 
-        return otpService.generateAndSendOtp(email, OtpPurpose.PASSWORD_RESET)
+        // Return expiration time without leaking whether the account exists (anti-enumeration)
+        return appProperties.otp.expirationSeconds
     }
 
     @Transactional
@@ -103,6 +104,8 @@ class PasswordResetService(
         passwordResetTokenRepository.save(resetTokenEntity)
 
         user.passwordHash = passwordEncoder.encode(request.newAuthHash)!!
+        user.failedLoginAttempts = 0
+        user.lockedUntil = null
         user.updatedAt = Instant.now()
         userRepository.save(user)
 
@@ -113,6 +116,7 @@ class PasswordResetService(
                     user = user,
                     salt = request.newSalt,
                     publicKey = request.newPublicKey,
+                    encryptedMasterKey = request.newEncryptedMasterKey,
                     encryptedPrivateKey = request.newEncryptedPrivateKey,
                     encryptedRecoveryKey = request.newEncryptedRecoveryKey,
                 )
@@ -124,6 +128,9 @@ class PasswordResetService(
         keyAttributes.kdfMemoryKb = request.kdfMemoryKb
         keyAttributes.kdfParallelism = request.kdfParallelism
         keyAttributes.publicKey = request.newPublicKey
+        if (request.newEncryptedMasterKey != null) {
+            keyAttributes.encryptedMasterKey = request.newEncryptedMasterKey
+        }
         keyAttributes.encryptedPrivateKey = request.newEncryptedPrivateKey
         keyAttributes.encryptedRecoveryKey = request.newEncryptedRecoveryKey
         keyAttributes.keyVersion += 1

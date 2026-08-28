@@ -16,14 +16,20 @@ class JwtService(
     private val appProperties: AppProperties,
 ) {
     private val signingKey: SecretKey by lazy {
-        val secretBytes = appProperties.jwt.secretKey.toByteArray(StandardCharsets.UTF_8)
-        if (secretBytes.size < 32) {
-            val padded = ByteArray(32)
-            System.arraycopy(secretBytes, 0, padded, 0, secretBytes.size.coerceAtMost(32))
-            Keys.hmacShaKeyFor(padded)
-        } else {
-            Keys.hmacShaKeyFor(secretBytes)
+        val rawKey = appProperties.jwt.secretKey.trim()
+        val secretBytes = try {
+            val decoded = Base64.getDecoder().decode(rawKey)
+            if (decoded.size >= 32) decoded else rawKey.toByteArray(StandardCharsets.UTF_8)
+        } catch (_: Exception) {
+            rawKey.toByteArray(StandardCharsets.UTF_8)
         }
+
+        if (secretBytes.size < 32) {
+            throw IllegalStateException(
+                "JWT secret key must be at least 256 bits (32 bytes). Current length: ${secretBytes.size} bytes.",
+            )
+        }
+        Keys.hmacShaKeyFor(secretBytes)
     }
 
     fun extractUsername(token: String): String = extractClaim(token, Claims::getSubject)
@@ -52,7 +58,6 @@ class JwtService(
         return Jwts.builder()
             .subject(userPrincipal.username)
             .claim("userId", userPrincipal.id)
-            .claim("email", userPrincipal.email)
             .claim("role", userPrincipal.role.name)
             .issuer(appProperties.jwt.issuer)
             .audience().add(appProperties.jwt.audience).and()

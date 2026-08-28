@@ -7,7 +7,6 @@ data class UserProfileResponse(
     val id: Long,
     val username: String,
     val email: String,
-    val name: String?,
     val role: Role,
     val isEmailVerified: Boolean,
     val createdAt: Instant,

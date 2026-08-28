@@ -17,7 +17,4 @@ data class SignUpInitRequest(
         message = "Username can only contain alphanumeric characters and underscores",
     )
     val username: String,
-
-    @field:Size(max = 100, message = "Name must not exceed 100 characters")
-    val name: String? = null,
 )

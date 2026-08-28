@@ -32,4 +32,13 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken, Long> {
         """,
     )
     fun revokeByTokenHash(@Param("tokenHash") tokenHash: String)
+
+    @Modifying
+    @Query(
+        """
+        DELETE FROM RefreshToken r
+        WHERE r.expiresAt < :cutoff OR r.isRevoked = true
+        """,
+    )
+    fun deleteExpiredOrRevokedBefore(@Param("cutoff") cutoff: java.time.Instant): Int
 }

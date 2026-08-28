@@ -19,6 +19,8 @@ class UserPrincipal(
 
     companion object {
         fun create(user: User): UserPrincipal {
+            val isNonLocked = user.isAccountNonLocked &&
+                (user.lockedUntil == null || java.time.Instant.now().isAfter(user.lockedUntil))
             val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}"))
             return UserPrincipal(
                 id = user.id ?: 0L,
@@ -27,7 +29,7 @@ class UserPrincipal(
                 passwordHash = user.passwordHash,
                 role = user.role,
                 isEmailVerified = user.isEmailVerified,
-                isAccountNonLocked = user.isAccountNonLocked,
+                isAccountNonLocked = isNonLocked,
                 authorities = authorities,
             )
         }

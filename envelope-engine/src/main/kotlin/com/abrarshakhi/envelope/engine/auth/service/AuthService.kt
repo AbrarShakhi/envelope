@@ -70,10 +70,11 @@ class AuthService(
             username = normalizedUsername,
             email = normalizedEmail,
             passwordHash = serverPasswordHash,
-            name = request.name?.trim(),
             role = Role.USER,
             isEmailVerified = true,
             isAccountNonLocked = true,
+            failedLoginAttempts = 0,
+            lockedUntil = null,
         )
         val savedUser = userRepository.save(user)
 
@@ -86,6 +87,7 @@ class AuthService(
             kdfMemoryKb = request.kdfMemoryKb,
             kdfParallelism = request.kdfParallelism,
             publicKey = request.publicKey,
+            encryptedMasterKey = request.encryptedMasterKey,
             encryptedPrivateKey = request.encryptedPrivateKey,
             encryptedRecoveryKey = request.encryptedRecoveryKey,
             keyVersion = 1,
@@ -133,19 +135,31 @@ class AuthService(
                 BadCredentialsException("Invalid username or password")
             }
 
-        if (!user.isEmailVerified) {
-            throw ForbiddenException("Account is not verified. Please complete email OTP verification.")
-        }
-
         if (!user.isAccountNonLocked) {
             throw ForbiddenException("Account has been suspended. Please contact support.")
         }
 
+        val now = Instant.now()
+        if (user.lockedUntil != null && now.isBefore(user.lockedUntil)) {
+            throw ForbiddenException("Account is temporarily locked due to multiple failed login attempts. Please try again later.")
+        }
+
+        if (!user.isEmailVerified) {
+            throw ForbiddenException("Account is not verified. Please complete email OTP verification.")
+        }
+
         if (!passwordEncoder.matches(request.clientAuthHash, user.passwordHash)) {
+            user.failedLoginAttempts += 1
+            if (user.failedLoginAttempts >= appProperties.accountLockout.maxFailedAttempts) {
+                user.lockedUntil = now.plusSeconds(appProperties.accountLockout.lockDurationSeconds)
+            }
+            userRepository.save(user)
             throw BadCredentialsException("Invalid username or password")
         }
 
-        user.lastLoginAt = Instant.now()
+        user.failedLoginAttempts = 0
+        user.lockedUntil = null
+        user.lastLoginAt = now
         userRepository.save(user)
 
         val keyAttributes = userKeyAttributesRepository.findByUserId(user.id!!)
@@ -239,7 +253,6 @@ class AuthService(
             id = user.id ?: 0L,
             username = user.username,
             email = user.email,
-            name = user.name,
             role = user.role,
             isEmailVerified = user.isEmailVerified,
             createdAt = user.createdAt,
@@ -248,6 +261,7 @@ class AuthService(
     private fun toUserKeysResponse(keys: UserKeyAttributes): UserKeysResponse =
         UserKeysResponse(
             publicKey = keys.publicKey,
+            encryptedMasterKey = keys.encryptedMasterKey,
             encryptedPrivateKey = keys.encryptedPrivateKey,
             encryptedRecoveryKey = keys.encryptedRecoveryKey,
             keyVersion = keys.keyVersion,
