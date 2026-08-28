@@ -1,16 +1,17 @@
 package com.abrarshakhi.envelope.engine.auth.entity
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "users")
@@ -19,35 +20,37 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(unique = true, nullable = false)
-    val email: String,
+    @Column(unique = true, nullable = false, length = 50)
+    var username: String,
 
-    @Column(nullable = false)
-    val password: String,
+    @Column(unique = true, nullable = false, length = 255)
+    var email: String,
 
-    @Column(nullable = false)
-    val name: String,
+    @Column(name = "password_hash", nullable = false, length = 255)
+    var passwordHash: String,
+
+    @Column(length = 100)
+    var name: String? = null,
 
     @Enumerated(EnumType.STRING)
-    val role: Role = Role.USER,
+    @Column(nullable = false, length = 30)
+    var role: Role = Role.USER,
 
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "is_email_verified", nullable = false)
+    var isEmailVerified: Boolean = false,
 
-    var refreshToken: String? = null,
-) : UserDetails {
+    @Column(name = "is_account_non_locked", nullable = false)
+    var isAccountNonLocked: Boolean = true,
 
-    override fun getAuthorities(): Collection<GrantedAuthority> =
-        listOf(org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_${role.name}"))
+    @Column(name = "created_at", nullable = false, updatable = false)
+    val createdAt: Instant = Instant.now(),
 
-    override fun getUsername(): String = email
-    override fun getPassword(): String = password
-    override fun isAccountNonExpired(): Boolean = true
-    override fun isAccountNonLocked(): Boolean = true
-    override fun isCredentialsNonExpired(): Boolean = true
-    override fun isEnabled(): Boolean = true
-}
+    @Column(name = "updated_at", nullable = false)
+    var updatedAt: Instant = Instant.now(),
 
-enum class Role {
-    USER,
-    ADMIN
-}
+    @Column(name = "last_login_at")
+    var lastLoginAt: Instant? = null,
+
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = true)
+    var keyAttributes: UserKeyAttributes? = null,
+)
