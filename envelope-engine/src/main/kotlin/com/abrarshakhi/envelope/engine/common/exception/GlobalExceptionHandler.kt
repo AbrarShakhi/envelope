@@ -2,6 +2,7 @@ package com.abrarshakhi.envelope.engine.common.exception
 
 import com.abrarshakhi.envelope.engine.common.api.ApiResponse
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
@@ -15,6 +16,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class GlobalExceptionHandler {
 
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
+    @ExceptionHandler(RateLimitExceededException::class)
+    fun handleRateLimitExceeded(ex: RateLimitExceededException): ResponseEntity<ApiResponse<Map<String, Any>>> {
+        val headers = HttpHeaders()
+        headers.set(HttpHeaders.RETRY_AFTER, ex.retryAfterSeconds.toString())
+        headers.set("X-RateLimit-Limit", ex.limit.toString())
+        headers.set("X-RateLimit-Remaining", "0")
+        headers.set("X-RateLimit-Reset", ex.retryAfterSeconds.toString())
+
+        val details = mapOf(
+            "retryAfterSeconds" to ex.retryAfterSeconds,
+            "limit" to ex.limit,
+            "windowSeconds" to ex.windowSeconds,
+        )
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+            .headers(headers)
+            .body(ApiResponse.error("Rate limit exceeded. Please try again in ${ex.retryAfterSeconds} seconds.", details))
+    }
 
     @ExceptionHandler(ResourceNotFoundException::class)
     fun handleNotFound(ex: ResourceNotFoundException): ResponseEntity<ApiResponse<Nothing>> {
