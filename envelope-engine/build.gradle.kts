@@ -35,7 +35,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
-	runtimeOnly("org.postgresql:PostgreSQL")
+	runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
