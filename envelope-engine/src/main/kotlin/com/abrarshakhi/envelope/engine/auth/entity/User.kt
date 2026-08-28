@@ -29,9 +29,6 @@ class User(
     @Column(name = "password_hash", nullable = false, length = 255)
     var passwordHash: String,
 
-    @Column(length = 100)
-    var name: String? = null,
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     var role: Role = Role.USER,
@@ -41,6 +38,12 @@ class User(
 
     @Column(name = "is_account_non_locked", nullable = false)
     var isAccountNonLocked: Boolean = true,
+
+    @Column(name = "failed_login_attempts", nullable = false)
+    var failedLoginAttempts: Int = 0,
+
+    @Column(name = "locked_until")
+    var lockedUntil: Instant? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),

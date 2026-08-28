@@ -5,12 +5,8 @@ server:
 spring:
     application:
         name: envelope-engine
-
-    # Production must explicitly use:
-    # SPRING_PROFILES_ACTIVE=prod
     profiles:
         active: ${SPRING_PROFILES_ACTIVE:dev}
-
     jpa:
         open-in-view: false
         hibernate:
@@ -18,8 +14,33 @@ spring:
         properties:
             hibernate:
                 format_sql: false
-
     flyway:
         enabled: true
         baseline-on-migrate: true
         locations: classpath:db/migration
+
+    account-lockout:
+        max-failed-attempts: ${ACCOUNT_LOCKOUT_MAX_ATTEMPTS:10}
+        lock-duration-seconds: ${ACCOUNT_LOCKOUT_DURATION_SECONDS:900} # 15 minutes
+    rate-limit:
+        enabled: true
+        auth-strict:
+            limit: 10
+            window-seconds: 60
+            key-type: IP
+        otp-strict:
+            limit: 3
+            window-seconds: 60
+            key-type: IP
+        token-refresh:
+            limit: 30
+            window-seconds: 60
+            key-type: IP_OR_USER
+        authenticated:
+            limit: 120
+            window-seconds: 60
+            key-type: USER_ID
+        global-public:
+            limit: 60
+            window-seconds: 60
+            key-type: IP

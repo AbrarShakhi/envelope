@@ -39,6 +39,9 @@ class UserKeyAttributes(
     @Column(name = "public_key", nullable = false, columnDefinition = "TEXT")
     var publicKey: String,
 
+    @Column(name = "encrypted_master_key", columnDefinition = "TEXT")
+    var encryptedMasterKey: String? = null,
+
     @Column(name = "encrypted_private_key", nullable = false, columnDefinition = "TEXT")
     var encryptedPrivateKey: String,
 
