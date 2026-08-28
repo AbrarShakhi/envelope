@@ -51,7 +51,7 @@ class AuthService(
     @Transactional
     fun completeSignUp(request: SignUpCompleteRequest): AuthResponse {
         val normalizedEmail = request.email.trim().lowercase()
-        val normalizedUsername = request.username.trim()
+        val normalizedUsername = request.username.trim().lowercase()
 
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
             throw ConflictException("An account with this email already exists.")
@@ -97,7 +97,7 @@ class AuthService(
 
     @Transactional(readOnly = true)
     fun preLogin(request: PreLoginRequest): PreLoginResponse {
-        val identifier = request.identifier.trim()
+        val identifier = request.identifier.trim().lowercase()
         val userOpt = userRepository.findByUsernameOrEmailIgnoreCase(identifier)
 
         if (userOpt.isPresent) {
@@ -115,7 +115,7 @@ class AuthService(
             }
         }
 
-        val pseudoSalt = CryptoUtils.generatePseudoSalt(identifier, appProperties.jwt.secretKey)
+        val pseudoSalt = CryptoUtils.generatePseudoSalt(identifier, appProperties.preLogin.pseudoSaltSecret)
         return PreLoginResponse(
             salt = pseudoSalt,
             kdfAlgorithm = "ARGON2ID",
@@ -127,7 +127,7 @@ class AuthService(
 
     @Transactional
     fun signIn(request: SignInRequest): AuthResponse {
-        val identifier = request.username.trim()
+        val identifier = request.username.trim().lowercase()
         val user = userRepository.findByUsernameOrEmailIgnoreCase(identifier)
             .orElseThrow {
                 BadCredentialsException("Invalid username or password")
@@ -141,7 +141,7 @@ class AuthService(
             throw ForbiddenException("Account has been suspended. Please contact support.")
         }
 
-        if (!passwordEncoder.matches(request.authHash, user.passwordHash)) {
+        if (!passwordEncoder.matches(request.clientAuthHash, user.passwordHash)) {
             throw BadCredentialsException("Invalid username or password")
         }
 
@@ -174,6 +174,15 @@ class AuthService(
         refreshTokenRepository.save(tokenEntity)
 
         val user = tokenEntity.user
+
+        if (!user.isAccountNonLocked) {
+            throw ForbiddenException("Account has been suspended.")
+        }
+
+        if (!user.isEmailVerified) {
+            throw ForbiddenException("Account is not verified.")
+        }
+
         val keyAttributes = userKeyAttributesRepository.findByUserId(user.id!!).orElse(null)
 
         return generateAuthResponse(user, keyAttributes)

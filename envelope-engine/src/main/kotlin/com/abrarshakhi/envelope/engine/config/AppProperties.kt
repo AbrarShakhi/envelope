@@ -9,23 +9,29 @@ class AppProperties {
     var jwt: JwtProperties = JwtProperties()
     var otp: OtpProperties = OtpProperties()
     var passwordReset: PasswordResetProperties = PasswordResetProperties()
+    var preLogin: PreLoginProperties = PreLoginProperties()
 
     class JwtProperties {
-        var secretKey: String =
-            "default-secret-key-that-is-at-least-32-bytes-long-for-testing-123456"
-        var expiration: Long = 900000 // 15 minutes in ms
-        var refreshTokenExpiration: Long = 604800000 // 7 days in ms
+        var secretKey: String = ""
+        var expiration: Long = 900000
+        var refreshTokenExpiration: Long = 604800000
         var issuer: String = "envelope-engine"
         var audience: String = "envelope-mobile"
     }
 
     class OtpProperties {
-        var expirationSeconds: Long = 600 // 10 minutes
+        var expirationSeconds: Long = 600
         var maxAttempts: Int = 5
-        var resendCooldownSeconds: Long = 60 // 60 seconds
+        var resendCooldownSeconds: Long = 60
+    }
+
+    class PreLoginProperties {
+        var pseudoSaltSecret: String = ""
     }
 
     class PasswordResetProperties {
-        var expirationSeconds: Long = 900 // 15 minutes
+        var expirationSeconds: Long = 900
     }
 }
+
+

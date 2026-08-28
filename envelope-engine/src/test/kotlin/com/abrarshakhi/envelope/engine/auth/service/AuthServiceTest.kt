@@ -21,9 +21,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.Optional
@@ -157,7 +155,7 @@ class AuthServiceTest {
 
     @Test
     fun `signIn should succeed with correct credentials and verified account`() {
-        val request = SignInRequest(username = "alice", authHash = "clientAuthHash")
+        val request = SignInRequest(username = "alice", clientAuthHash = "clientAuthHash")
         val user = User(
             id = 1L,
             username = "alice",
@@ -176,7 +174,7 @@ class AuthServiceTest {
         )
 
         `when`(userRepository.findByUsernameOrEmailIgnoreCase(request.username)).thenReturn(Optional.of(user))
-        `when`(passwordEncoder.matches(request.authHash, user.passwordHash)).thenReturn(true)
+        `when`(passwordEncoder.matches(request.clientAuthHash, user.passwordHash)).thenReturn(true)
         `when`(userRepository.save(any(User::class.java))).thenReturn(user)
         `when`(userKeyAttributesRepository.findByUserId(1L)).thenReturn(Optional.of(keyAttributes))
         `when`(jwtService.generateAccessToken(any())).thenReturn("mock.jwt.token")

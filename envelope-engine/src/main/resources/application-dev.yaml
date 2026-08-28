@@ -1,29 +1,32 @@
 spring:
-  datasource:
-    url: ${DATABASE_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    datasource:
+        url: ${DATABASE_URL}
+        username: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
 
-  jpa:
-    show-sql: true
+    jpa:
+        show-sql: true
 
-  security:
+envelope:
     jwt:
-      secret-key: ${JWT_SECRET_KEY}
-      expiration: 900000 # 15 minutes in milliseconds
-      refresh-token-expiration: 604800000 # 7 days in milliseconds
-      issuer: envelope-engine
-      audience: envelope-mobile
+        secret-key: ${JWT_SECRET_KEY}
+        expiration: 900000
+        refresh-token-expiration: 604800000
+        issuer: envelope-engine
+        audience: envelope-mobile
 
-  otp:
-    expiration-seconds: 600
-    max-attempts: 5
-    resend-cooldown-seconds: 60
+    otp:
+        expiration-seconds: 600
+        max-attempts: 5
+        resend-cooldown-seconds: 60
 
-  password-reset:
-    expiration-seconds: 900
+    pre-login:
+        pseudo-salt-secret: ${PRELOGIN_PSEUDO_SALT_SECRET}
+
+    password-reset:
+        expiration-seconds: 900
 
 logging:
-  level:
-    com.abrarshakhi.envelope.engine: DEBUG
-    org.springframework.security: INFO
+    level:
+        com.abrarshakhi.envelope.engine: DEBUG
+        org.springframework.security: INFO

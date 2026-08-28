@@ -3,7 +3,7 @@ package com.abrarshakhi.envelope.engine.common.util
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.util.Base64
+import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import kotlin.math.pow
@@ -56,12 +56,26 @@ object CryptoUtils {
      * Generates a deterministic pseudo-random salt for unknown users in pre-login.
      * Prevents user enumeration and timing analysis.
      */
-    fun generatePseudoSalt(identifier: String, serverHmacKey: String): String {
+    fun generatePseudoSalt(
+        identifier: String,
+        serverHmacKey: String,
+    ): String {
+        val normalizedIdentifier = identifier
+            .trim()
+            .lowercase(Locale.ROOT)
+
         val mac = Mac.getInstance("HmacSHA256")
-        val secretKeySpec =
-            SecretKeySpec(serverHmacKey.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
-        mac.init(secretKeySpec)
-        val hmacBytes = mac.doFinal(identifier.lowercase().toByteArray(StandardCharsets.UTF_8))
+        val secretKey = SecretKeySpec(
+            serverHmacKey.toByteArray(StandardCharsets.UTF_8),
+            "HmacSHA256",
+        )
+
+        mac.init(secretKey)
+
+        val hmacBytes = mac.doFinal(
+            normalizedIdentifier.toByteArray(StandardCharsets.UTF_8),
+        )
+
         return Base64.getEncoder().encodeToString(hmacBytes)
     }
 }

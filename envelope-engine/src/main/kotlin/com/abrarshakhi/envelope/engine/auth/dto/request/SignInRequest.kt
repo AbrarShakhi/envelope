@@ -7,5 +7,5 @@ data class SignInRequest(
     val username: String,
 
     @field:NotBlank(message = "Auth hash is required")
-    val authHash: String,
+    val clientAuthHash: String,
 )
