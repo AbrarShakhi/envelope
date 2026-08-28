@@ -5,6 +5,13 @@ spring:
         password: ${POSTGRES_PASSWORD}
     jpa:
         show-sql: true
+    security:
+        jwt:
+            secret-key: ${JWT_SECRET_KEY}
+            expiration: 900000  # 15 minutes in milliseconds
+            refresh-token-expiration: 604800000  # 7 days in milliseconds
+            issuer: envelope-engine
+            audience: envelope-mobile
 logging:
     level:
         com.abrarshakhi.envelope.engine: DEBUG

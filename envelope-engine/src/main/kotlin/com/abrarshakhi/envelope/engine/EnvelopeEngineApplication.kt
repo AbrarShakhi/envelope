@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class EnvelopeEngineApplication
 
 fun main(args: Array<String>) {
-	runApplication<EnvelopeEngineApplication>(*args)
+    runApplication<EnvelopeEngineApplication>(*args)
 }
