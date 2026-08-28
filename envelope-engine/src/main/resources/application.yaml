@@ -20,8 +20,8 @@ spring:
         locations: classpath:db/migration
 
     account-lockout:
-        max-failed-attempts: ${ACCOUNT_LOCKOUT_MAX_ATTEMPTS:10}
-        lock-duration-seconds: ${ACCOUNT_LOCKOUT_DURATION_SECONDS:900} # 15 minutes
+        max-failed-attempts: ${ACCOUNT_LOCKOUT_MAX_ATTEMPTS}
+        lock-duration-seconds: ${ACCOUNT_LOCKOUT_DURATION_SECONDS}
     rate-limit:
         enabled: true
         auth-strict:
