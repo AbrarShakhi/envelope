@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Go
+*.test
+coverage.out
+
+# Local environment
+.env
+.env.*
+!.env.example
