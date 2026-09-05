@@ -5,6 +5,9 @@
 *.ipr
 out/
 
+.mise.toml
+!mise.toml
+
 .DS_Store
 
 secrets/.env
