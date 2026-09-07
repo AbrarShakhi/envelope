@@ -1,4 +1,4 @@
-package com.abrarshakhi.envelope.ui.theme
+package com.abrarshakhi.envelope.common.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
