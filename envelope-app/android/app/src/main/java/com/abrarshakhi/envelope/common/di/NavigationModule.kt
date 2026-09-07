@@ -16,7 +16,7 @@ val navigationModule = module {
     navigation<AppRoute.Onboarding> {
         val navigator = get<AppNavigator>()
         OnboardingScreen(
-            onContinueClick = { navigator.navigateTo(AppRoute.Login) },
+            onFinish = { navigator.navigateTo(AppRoute.Login) },
         )
     }
 

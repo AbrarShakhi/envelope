@@ -11,9 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/** Placeholder */
 @Composable
-fun OnboardingScreen(onContinueClick: () -> Unit) {
+fun OnboardingScreen(onFinish: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -22,6 +21,6 @@ fun OnboardingScreen(onContinueClick: () -> Unit) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(text = "Onboarding")
-        Button(onClick = onContinueClick) { Text(text = "Continue") }
+        Button(onClick = onFinish) { Text(text = "Continue") }
     }
 }
