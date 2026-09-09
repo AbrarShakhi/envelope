@@ -1,4 +1,4 @@
-package com.abrarshakhi.envelope.onboarding
+package com.abrarshakhi.envelope.auth.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun OnboardingScreen(onFinish: () -> Unit) {
+fun SignUpScreen(onSignUpSuccess: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -20,7 +20,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(text = "Placeholder onboarding Screen, wil be implemented later")
-        Button(onClick = onFinish) { Text(text = "Continue") }
+        Text(text = "SignUp")
+        Button(onClick = onSignUpSuccess) { Text(text = "SignUp") }
     }
 }

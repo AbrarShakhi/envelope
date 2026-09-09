@@ -11,7 +11,7 @@ class AppNavigator(startDestination: AppRoute) {
         backStack.add(destination)
     }
 
-    fun replaceAll(destination: AppRoute) {
+    fun clearAndNavigateTo(destination: AppRoute) {
         backStack.clear()
         backStack.add(destination)
     }
@@ -19,6 +19,18 @@ class AppNavigator(startDestination: AppRoute) {
     fun goBack(): Boolean {
         if (backStack.size <= 1) return false
         backStack.removeAt(backStack.lastIndex)
+        return true
+    }
+
+    fun navigateBackTo(destination: AppRoute): Boolean {
+        val index = backStack.indexOf(destination)
+
+        if (index == -1) return false
+
+        while (backStack.last() != destination) {
+            backStack.removeAt(backStack.lastIndex)
+        }
+
         return true
     }
 }

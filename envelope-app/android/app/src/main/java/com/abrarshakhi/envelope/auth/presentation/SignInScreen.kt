@@ -12,13 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun SignInScreen(onSignInSuccess: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Login")
-        Button(onClick = onLoginSuccess) { Text(text = "Log in") }
+        Text(text = "SignIn")
+        Button(onClick = onSignInSuccess) { Text(text = "Sign In") }
     }
 }

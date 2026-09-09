@@ -7,7 +7,10 @@ sealed interface AppRoute {
     data object Onboarding : AppRoute
 
     @Serializable
-    data object Login : AppRoute
+    data object SignIn : AppRoute
+
+    @Serializable
+    data object SignUp: AppRoute
 
     @Serializable
     data object Home : AppRoute
